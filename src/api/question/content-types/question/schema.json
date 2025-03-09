@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "questions",
+  "info": {
+    "singularName": "question",
+    "pluralName": "questions",
+    "displayName": "Question",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "answer": {
+      "type": "text",
+      "required": true,
+      "maxLength": 180
+    },
+    "hint": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "difficulty": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::difficulty.difficulty",
+      "inversedBy": "questions"
+    },
+    "topics": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "questions"
+    }
+  }
+}

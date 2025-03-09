@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sections",
+  "info": {
+    "singularName": "section",
+    "pluralName": "sections",
+    "displayName": "Section",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "display_name": {
+      "type": "string",
+      "required": true,
+      "unique": false
+    },
+    "display_order": {
+      "type": "integer",
+      "required": true,
+      "unique": true,
+      "default": 0
+    },
+    "exam": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::exam.exam",
+      "inversedBy": "sections"
+    },
+    "allowed_topics": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "sections"
+    },
+    "decks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::deck.deck",
+      "inversedBy": "sections"
+    }
+  }
+}
