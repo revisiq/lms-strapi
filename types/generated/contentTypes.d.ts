@@ -385,16 +385,30 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
-    difficulty: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::difficulty.difficulty'
-    >;
     display_image: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'> &
       Schema.Attribute.Private;
+    maxDifficulty: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
+    minDifficulty: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.Relation<'manyToMany', 'api::section.section'>;
@@ -402,39 +416,6 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-  };
-}
-
-export interface ApiDifficultyDifficulty extends Struct.CollectionTypeSchema {
-  collectionName: 'difficulties';
-  info: {
-    displayName: 'Difficulty';
-    pluralName: 'difficulties';
-    singularName: 'difficulty';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    decks: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'>;
-    level: Schema.Attribute.Enumeration<['easy', 'medium', 'hard']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'easy'>;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::difficulty.difficulty'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    questions: Schema.Attribute.Relation<'oneToMany', 'api::question.question'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    weight: Schema.Attribute.Integer;
   };
 }
 
@@ -487,10 +468,14 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    difficulty: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::difficulty.difficulty'
-    >;
+    difficulty: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -556,6 +541,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
 export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
   collectionName: 'topics';
   info: {
+    description: '';
     displayName: 'Topic';
     pluralName: 'topics';
     singularName: 'topic';
@@ -573,7 +559,9 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
     questions: Schema.Attribute.Relation<
       'manyToMany',
@@ -1096,7 +1084,6 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::deck.deck': ApiDeckDeck;
-      'api::difficulty.difficulty': ApiDifficultyDifficulty;
       'api::exam.exam': ApiExamExam;
       'api::question.question': ApiQuestionQuestion;
       'api::section.section': ApiSectionSection;

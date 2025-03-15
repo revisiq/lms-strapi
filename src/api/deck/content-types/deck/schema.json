@@ -41,11 +41,17 @@
       "target": "api::topic.topic",
       "inversedBy": "decks"
     },
-    "difficulty": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::difficulty.difficulty",
-      "inversedBy": "decks"
+    "minDifficulty": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 10
+    },
+    "maxDifficulty": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 10
     }
   }
 }

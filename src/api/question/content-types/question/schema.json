@@ -25,17 +25,16 @@
       "type": "string",
       "maxLength": 80
     },
-    "difficulty": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::difficulty.difficulty",
-      "inversedBy": "questions"
-    },
     "topics": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::topic.topic",
       "inversedBy": "questions"
+    },
+    "difficulty": {
+      "min": 1,
+      "max": 10,
+      "type": "integer"
     }
   }
 }
