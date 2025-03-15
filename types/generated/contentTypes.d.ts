@@ -469,6 +469,7 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     difficulty: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
         {
           max: 10;
@@ -554,7 +555,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
-    display_name: Schema.Attribute.String;
+    display_name: Schema.Attribute.String & Schema.Attribute.Required;
     exams: Schema.Attribute.Relation<'manyToMany', 'api::exam.exam'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
