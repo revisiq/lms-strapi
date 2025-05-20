@@ -24,18 +24,6 @@
     "hint": {
       "type": "string",
       "maxLength": 80
-    },
-    "topics": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::topic.topic",
-      "inversedBy": "questions"
-    },
-    "difficulty": {
-      "min": 1,
-      "max": 10,
-      "type": "integer",
-      "required": true
     }
   }
 }

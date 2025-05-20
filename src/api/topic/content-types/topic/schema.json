@@ -37,12 +37,6 @@
       "relation": "manyToMany",
       "target": "api::deck.deck",
       "mappedBy": "topics"
-    },
-    "questions": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::question.question",
-      "mappedBy": "topics"
     }
   }
 }
