@@ -27,22 +27,10 @@
       "unique": true,
       "default": 0
     },
-    "exam": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::exam.exam",
-      "inversedBy": "sections"
-    },
-    "allowed_topics": {
+    "topics": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::topic.topic",
-      "inversedBy": "sections"
-    },
-    "decks": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::deck.deck",
       "inversedBy": "sections"
     },
     "is_visible": {
@@ -53,6 +41,15 @@
     "slug": {
       "type": "string",
       "required": true
+    },
+    "exam": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::exam.exam",
+      "inversedBy": "sections"
+    },
+    "shortDescription": {
+      "type": "text"
     }
   }
 }

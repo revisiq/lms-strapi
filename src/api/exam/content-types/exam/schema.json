@@ -18,12 +18,6 @@
     "description": {
       "type": "richtext"
     },
-    "allowed_topics": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::topic.topic",
-      "inversedBy": "exams"
-    },
     "sections": {
       "type": "relation",
       "relation": "oneToMany",

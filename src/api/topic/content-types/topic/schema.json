@@ -20,23 +20,23 @@
       "type": "string",
       "required": true
     },
-    "exams": {
+    "decks": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::exam.exam",
-      "mappedBy": "allowed_topics"
+      "relation": "oneToMany",
+      "target": "api::deck.deck",
+      "mappedBy": "topic"
     },
     "sections": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::section.section",
-      "mappedBy": "allowed_topics"
-    },
-    "decks": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::deck.deck",
       "mappedBy": "topics"
+    },
+    "shortDescription": {
+      "type": "text"
+    },
+    "display_order": {
+      "type": "integer"
     }
   }
 }

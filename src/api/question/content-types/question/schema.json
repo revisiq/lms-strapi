@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "attributes": {
     "question": {
@@ -24,6 +24,21 @@
     "hint": {
       "type": "string",
       "maxLength": 80
+    },
+    "example": {
+      "type": "string"
+    },
+    "decks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::deck.deck",
+      "inversedBy": "questions"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "inversedBy": "questions"
     }
   }
 }

@@ -18,6 +18,18 @@
     "display_name": {
       "type": "string",
       "required": true
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::question.question",
+      "mappedBy": "tags"
+    },
+    "decks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::deck.deck",
+      "mappedBy": "tags"
     }
   }
 }

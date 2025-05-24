@@ -388,31 +388,19 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     display_image: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
+    limit: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<50>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'> &
       Schema.Attribute.Private;
-    maxDifficulty: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 10;
-          min: 1;
-        },
-        number
-      >;
-    minDifficulty: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 10;
-          min: 1;
-        },
-        number
-      >;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    offset: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
-    sections: Schema.Attribute.Relation<'manyToMany', 'api::section.section'>;
-    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    questions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::question.question'
+    >;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -431,7 +419,6 @@ export interface ApiExamExam extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    allowed_topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -457,7 +444,7 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     singularName: 'question';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     answer: Schema.Attribute.Text &
@@ -468,6 +455,8 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
+    example: Schema.Attribute.String;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -484,6 +473,7 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 60;
       }>;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -502,11 +492,9 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    allowed_topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
     display_name: Schema.Attribute.String & Schema.Attribute.Required;
     display_order: Schema.Attribute.Integer &
       Schema.Attribute.Required &
@@ -526,7 +514,9 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
+    shortDescription: Schema.Attribute.Text;
     slug: Schema.Attribute.String & Schema.Attribute.Required;
+    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -547,6 +537,7 @@ export interface ApiTagTag extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
     display_name: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'> &
@@ -555,6 +546,10 @@ export interface ApiTagTag extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
+    questions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::question.question'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -576,9 +571,9 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
+    decks: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'>;
     display_name: Schema.Attribute.String & Schema.Attribute.Required;
-    exams: Schema.Attribute.Relation<'manyToMany', 'api::exam.exam'>;
+    display_order: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
@@ -587,6 +582,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
       Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.Relation<'manyToMany', 'api::section.section'>;
+    shortDescription: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

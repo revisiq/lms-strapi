@@ -29,29 +29,30 @@
         "audios"
       ]
     },
-    "sections": {
+    "questions": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::section.section",
+      "target": "api::question.question",
       "mappedBy": "decks"
     },
-    "topics": {
+    "offset": {
+      "type": "integer"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 50
+    },
+    "tags": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::topic.topic",
+      "target": "api::tag.tag",
       "inversedBy": "decks"
     },
-    "minDifficulty": {
-      "type": "integer",
-      "required": true,
-      "min": 1,
-      "max": 10
-    },
-    "maxDifficulty": {
-      "type": "integer",
-      "required": true,
-      "min": 1,
-      "max": 10
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::topic.topic",
+      "inversedBy": "decks"
     }
   }
 }
