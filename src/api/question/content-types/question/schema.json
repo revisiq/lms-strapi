@@ -14,7 +14,7 @@
     "question": {
       "type": "string",
       "required": true,
-      "maxLength": 60
+      "maxLength": 150
     },
     "answer": {
       "type": "text",

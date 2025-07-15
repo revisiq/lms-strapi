@@ -471,7 +471,7 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     question: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
+        maxLength: 150;
       }>;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -516,7 +516,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     shortDescription: Schema.Attribute.Text;
     slug: Schema.Attribute.String & Schema.Attribute.Required;
-    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    topics: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -581,7 +581,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
-    sections: Schema.Attribute.Relation<'manyToMany', 'api::section.section'>;
+    section: Schema.Attribute.Relation<'manyToOne', 'api::section.section'>;
     shortDescription: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

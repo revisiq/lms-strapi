@@ -26,11 +26,11 @@
       "target": "api::deck.deck",
       "mappedBy": "topic"
     },
-    "sections": {
+    "section": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "api::section.section",
-      "mappedBy": "topics"
+      "inversedBy": "topics"
     },
     "shortDescription": {
       "type": "text"

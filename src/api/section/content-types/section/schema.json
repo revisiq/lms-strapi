@@ -27,12 +27,6 @@
       "unique": true,
       "default": 0
     },
-    "topics": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::topic.topic",
-      "inversedBy": "sections"
-    },
     "is_visible": {
       "type": "boolean",
       "default": false,
@@ -50,6 +44,12 @@
     },
     "shortDescription": {
       "type": "text"
+    },
+    "topics": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::topic.topic",
+      "mappedBy": "section"
     }
   }
 }
