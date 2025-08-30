@@ -457,6 +457,10 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
     example: Schema.Attribute.String;
+    explanation: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
