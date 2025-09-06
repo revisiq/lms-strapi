@@ -21,6 +21,9 @@
       "required": true,
       "unique": false
     },
+    "description": {
+      "type": "string"
+    },
     "display_order": {
       "type": "integer",
       "required": true,
