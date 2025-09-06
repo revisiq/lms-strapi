@@ -385,10 +385,12 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
+    longDescription: Schema.Attribute.Text;
     display_image: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
     limit: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<50>;
+    display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'> &
       Schema.Attribute.Private;
@@ -500,6 +502,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     display_name: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.String;
     display_order: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &

@@ -18,6 +18,9 @@
     "description": {
       "type": "text"
     },
+    "longDescription": {
+      "type": "text"
+    },
     "display_image": {
       "type": "media",
       "multiple": false,
@@ -41,6 +44,10 @@
     "limit": {
       "type": "integer",
       "default": 50
+    },
+    "display_order": {
+      "type": "integer",
+      "default": 0
     },
     "tags": {
       "type": "relation",
