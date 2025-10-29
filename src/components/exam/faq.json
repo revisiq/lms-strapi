@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_exam_faqs",
+  "info": {
+    "displayName": "FAQ",
+    "icon": "question",
+    "description": "Frequently asked question and answer."
+  },
+  "options": {},
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true,
+      "minLength": 5,
+      "maxLength": 200
+    },
+    "answer": {
+      "type": "text",
+      "required": true,
+      "minLength": 20,
+      "maxLength": 1000
+    }
+  }
+}

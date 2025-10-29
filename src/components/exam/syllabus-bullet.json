@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_exam_syllabus_bullets",
+  "info": {
+    "displayName": "Syllabus Bullet",
+    "icon": "list",
+    "description": "Single syllabus bullet point."
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 120
+    }
+  }
+}

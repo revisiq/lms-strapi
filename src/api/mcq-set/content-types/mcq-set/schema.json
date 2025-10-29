@@ -1,0 +1,106 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mcq_sets",
+  "info": {
+    "singularName": "mcq-set",
+    "pluralName": "mcq-sets",
+    "displayName": "MCQ Set",
+    "description": "Practice content for exam-focused MCQ sets."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    },
+    "content-type-builder": {
+      "visible": true
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 10,
+      "maxLength": 120
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "exam": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "section": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 80
+    },
+    "topic": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 120
+    },
+    "questionType": {
+      "type": "enumeration",
+      "enum": [
+        "MCQ",
+        "FILL_IN",
+        "TRUE_FALSE"
+      ],
+      "default": "MCQ",
+      "required": true
+    },
+    "totalQuestions": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 200
+    },
+    "intro": {
+      "type": "text",
+      "required": true,
+      "minLength": 20,
+      "maxLength": 400
+    },
+    "syllabusBullets": {
+      "type": "component",
+      "repeatable": true,
+      "component": "exam.syllabus-bullet",
+      "min": 1,
+      "max": 10
+    },
+    "freeQuestions": {
+      "type": "component",
+      "repeatable": true,
+      "component": "exam.mcq",
+      "min": 1,
+      "max": 10
+    },
+    "faqs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "exam.faq",
+      "min": 0,
+      "max": 10
+    },
+    "parentHubUrl": {
+      "type": "string",
+      "required": true,
+      "regex": "^\\/[a-z0-9]+(?:[\\/-][a-z0-9]+)*$"
+    },
+    "canonicalUrl": {
+      "type": "string",
+      "required": true,
+      "regex": "^https?:\\/\\/[^\\s]+$"
+    }
+  }
+}

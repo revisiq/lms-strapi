@@ -1,5 +1,69 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface ExamFaq extends Struct.ComponentSchema {
+  collectionName: 'components_exam_faqs';
+  info: {
+    description: 'Frequently asked question and answer.';
+    displayName: 'FAQ';
+    icon: 'question';
+  };
+  attributes: {
+    answer: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+        minLength: 20;
+      }>;
+    question: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+        minLength: 5;
+      }>;
+  };
+}
+
+export interface ExamMcq extends Struct.ComponentSchema {
+  collectionName: 'components_exam_mcqs';
+  info: {
+    description: 'Multiple-choice question with four options.';
+    displayName: 'MCQ';
+    icon: 'check-square';
+  };
+  attributes: {
+    correct_option: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+        minLength: 1;
+      }>;
+    options: Schema.Attribute.JSON & Schema.Attribute.Required;
+    question: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+        minLength: 5;
+      }>;
+  };
+}
+
+export interface ExamSyllabusBullet extends Struct.ComponentSchema {
+  collectionName: 'components_exam_syllabus_bullets';
+  info: {
+    description: 'Single syllabus bullet point.';
+    displayName: 'Syllabus Bullet';
+    icon: 'list';
+  };
+  attributes: {
+    text: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+        minLength: 2;
+      }>;
+  };
+}
+
 export interface SharedMedia extends Struct.ComponentSchema {
   collectionName: 'components_shared_media';
   info: {
@@ -65,6 +129,9 @@ export interface SharedSlider extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'exam.faq': ExamFaq;
+      'exam.mcq': ExamMcq;
+      'exam.syllabus-bullet': ExamSyllabusBullet;
       'shared.media': SharedMedia;
       'shared.quote': SharedQuote;
       'shared.rich-text': SharedRichText;
