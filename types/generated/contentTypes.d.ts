@@ -385,15 +385,15 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
-    longDescription: Schema.Attribute.Text;
     display_image: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
-    limit: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<50>;
     display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    limit: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<50>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::deck.deck'> &
       Schema.Attribute.Private;
+    longDescription: Schema.Attribute.Text;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     offset: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
@@ -431,6 +431,115 @@ export interface ApiExamExam extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.Relation<'oneToMany', 'api::section.section'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMcqSetMcqSet extends Struct.CollectionTypeSchema {
+  collectionName: 'mcq_sets';
+  info: {
+    description: 'Practice content for exam-focused MCQ sets.';
+    displayName: 'MCQ Set';
+    pluralName: 'mcq-sets';
+    singularName: 'mcq-set';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+    'content-type-builder': {
+      visible: true;
+    };
+  };
+  attributes: {
+    canonicalUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    exam: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+        minLength: 2;
+      }>;
+    faqs: Schema.Attribute.Component<'exam.faq', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 0;
+        },
+        number
+      >;
+    freeQuestions: Schema.Attribute.Component<'exam.mcq', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+        minLength: 20;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::mcq-set.mcq-set'
+    > &
+      Schema.Attribute.Private;
+    parentHubUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    questionType: Schema.Attribute.Enumeration<
+      ['MCQ', 'FILL_IN', 'TRUE_FALSE']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'MCQ'>;
+    section: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+        minLength: 2;
+      }>;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    syllabusBullets: Schema.Attribute.Component<'exam.syllabus-bullet', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+        minLength: 10;
+      }>;
+    topic: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+        minLength: 2;
+      }>;
+    totalQuestions: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 200;
+          min: 1;
+        },
+        number
+      >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -501,8 +610,8 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    display_name: Schema.Attribute.String & Schema.Attribute.Required;
     description: Schema.Attribute.String;
+    display_name: Schema.Attribute.String & Schema.Attribute.Required;
     display_order: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -1107,6 +1216,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::deck.deck': ApiDeckDeck;
       'api::exam.exam': ApiExamExam;
+      'api::mcq-set.mcq-set': ApiMcqSetMcqSet;
       'api::question.question': ApiQuestionQuestion;
       'api::section.section': ApiSectionSection;
       'api::tag.tag': ApiTagTag;

@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_exam_mcqs",
+  "info": {
+    "displayName": "MCQ",
+    "icon": "check-square",
+    "description": "Multiple-choice question with four options."
+  },
+  "options": {},
+  "attributes": {
+    "question": {
+      "type": "text",
+      "required": true,
+      "minLength": 5,
+      "maxLength": 500
+    },
+    "options": {
+      "type": "json",
+      "required": true
+    },
+    "correct_option": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 160
+    }
+  }
+}
