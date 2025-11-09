@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "structured_quiz_decks",
+  "info": {
+    "singularName": "structured-quiz-deck",
+    "pluralName": "structured-quiz-decks",
+    "displayName": "Structured Quiz Deck",
+    "description": "Ordered quiz configuration"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::topic.topic",
+      "inversedBy": "structured_quiz_decks",
+      "required": true
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    },
+    "exclusions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    },
+    "tag_logic": {
+      "type": "enumeration",
+      "enum": [
+        "ANY",
+        "ALL"
+      ],
+      "default": "ANY",
+      "required": true
+    },
+    "ordered_items": {
+      "type": "json",
+      "required": true
+    },
+    "keep_groups_together": {
+      "type": "boolean",
+      "default": true
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": [
+        "public",
+        "unlisted",
+        "draft"
+      ],
+      "default": "draft",
+      "required": true
+    }
+  }
+}

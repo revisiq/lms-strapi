@@ -1,0 +1,84 @@
+{
+  "kind": "collectionType",
+  "collectionName": "adaptive_quiz_decks",
+  "info": {
+    "singularName": "adaptive-quiz-deck",
+    "pluralName": "adaptive-quiz-decks",
+    "displayName": "Adaptive Quiz Deck",
+    "description": "Adaptive quiz configuration"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::topic.topic",
+      "inversedBy": "adaptive_quiz_decks",
+      "required": true
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    },
+    "exclusions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    },
+    "tag_logic": {
+      "type": "enumeration",
+      "enum": [
+        "ANY",
+        "ALL"
+      ],
+      "default": "ANY",
+      "required": true
+    },
+    "include_difficulties": {
+      "type": "json",
+      "required": false
+    },
+    "batch_size": {
+      "type": "integer",
+      "default": 5,
+      "min": 1
+    },
+    "max_questions_per_session": {
+      "type": "integer",
+      "default": 25,
+      "min": 1
+    },
+    "rule_policy": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "keep_groups_together": {
+      "type": "boolean",
+      "default": true
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": [
+        "public",
+        "unlisted",
+        "draft"
+      ],
+      "default": "draft",
+      "required": true
+    }
+  }
+}

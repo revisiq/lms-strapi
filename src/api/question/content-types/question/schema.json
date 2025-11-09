@@ -18,7 +18,6 @@
     },
     "answer": {
       "type": "text",
-      "required": true,
       "maxLength": 180
     },
     "hint": {
@@ -43,6 +42,40 @@
     "explanation": {
       "type": "string",
       "maxLength": 300
+    },
+    "stimulus": {
+      "type": "text"
+    },
+    "difficulty": {
+      "type": "enumeration",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "required": true,
+      "default": "medium"
+    },
+    "group_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "MCQ",
+        "RC",
+        "Parajumble",
+        "Syllogism",
+        "SentenceCompletion",
+        "Other"
+      ],
+      "default": "MCQ",
+      "required": true
+    },
+    "options": {
+      "type": "component",
+      "repeatable": true,
+      "component": "question.option"
     }
   }
 }

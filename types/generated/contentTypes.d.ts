@@ -369,6 +369,75 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAdaptiveQuizDeckAdaptiveQuizDeck
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'adaptive_quiz_decks';
+  info: {
+    description: 'Adaptive quiz configuration';
+    displayName: 'Adaptive Quiz Deck';
+    pluralName: 'adaptive-quiz-decks';
+    singularName: 'adaptive-quiz-deck';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    batch_size: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<5>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    exclusions: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    include_difficulties: Schema.Attribute.JSON;
+    keep_groups_together: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::adaptive-quiz-deck.adaptive-quiz-deck'
+    > &
+      Schema.Attribute.Private;
+    max_questions_per_session: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<25>;
+    publishedAt: Schema.Attribute.DateTime;
+    rule_policy: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    tag_logic: Schema.Attribute.Enumeration<['ANY', 'ALL']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'ANY'>;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+        minLength: 3;
+      }>;
+    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    visibility: Schema.Attribute.Enumeration<['public', 'unlisted', 'draft']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'draft'>;
+  };
+}
+
 export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
   collectionName: 'decks';
   info: {
@@ -406,6 +475,7 @@ export interface ApiDeckDeck extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    visible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -559,7 +629,6 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
   };
   attributes: {
     answer: Schema.Attribute.Text &
-      Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 180;
       }>;
@@ -567,11 +636,15 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     decks: Schema.Attribute.Relation<'manyToMany', 'api::deck.deck'>;
+    difficulty: Schema.Attribute.Enumeration<['easy', 'medium', 'hard']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'medium'>;
     example: Schema.Attribute.String;
     explanation: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 300;
       }>;
+    group_id: Schema.Attribute.String;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -582,13 +655,20 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       'api::question.question'
     > &
       Schema.Attribute.Private;
+    options: Schema.Attribute.Component<'question.option', true>;
     publishedAt: Schema.Attribute.DateTime;
     question: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 150;
       }>;
+    stimulus: Schema.Attribute.Text;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    type: Schema.Attribute.Enumeration<
+      ['MCQ', 'RC', 'Parajumble', 'Syllogism', 'SentenceCompletion', 'Other']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'MCQ'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -639,6 +719,55 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiStructuredQuizDeckStructuredQuizDeck
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'structured_quiz_decks';
+  info: {
+    description: 'Ordered quiz configuration';
+    displayName: 'Structured Quiz Deck';
+    pluralName: 'structured-quiz-decks';
+    singularName: 'structured-quiz-deck';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    exclusions: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    keep_groups_together: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::structured-quiz-deck.structured-quiz-deck'
+    > &
+      Schema.Attribute.Private;
+    ordered_items: Schema.Attribute.JSON & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    tag_logic: Schema.Attribute.Enumeration<['ANY', 'ALL']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'ANY'>;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+        minLength: 3;
+      }>;
+    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    visibility: Schema.Attribute.Enumeration<['public', 'unlisted', 'draft']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'draft'>;
+  };
+}
+
 export interface ApiTagTag extends Struct.CollectionTypeSchema {
   collectionName: 'tags';
   info: {
@@ -684,6 +813,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    adaptive_quiz_decks: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::adaptive-quiz-deck.adaptive-quiz-deck'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -699,6 +832,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     section: Schema.Attribute.Relation<'manyToOne', 'api::section.section'>;
     shortDescription: Schema.Attribute.Text;
+    structured_quiz_decks: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::structured-quiz-deck.structured-quiz-deck'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1214,11 +1351,13 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::adaptive-quiz-deck.adaptive-quiz-deck': ApiAdaptiveQuizDeckAdaptiveQuizDeck;
       'api::deck.deck': ApiDeckDeck;
       'api::exam.exam': ApiExamExam;
       'api::mcq-set.mcq-set': ApiMcqSetMcqSet;
       'api::question.question': ApiQuestionQuestion;
       'api::section.section': ApiSectionSection;
+      'api::structured-quiz-deck.structured-quiz-deck': ApiStructuredQuizDeckStructuredQuizDeck;
       'api::tag.tag': ApiTagTag;
       'api::topic.topic': ApiTopicTopic;
       'plugin::content-releases.release': PluginContentReleasesRelease;

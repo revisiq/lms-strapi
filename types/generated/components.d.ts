@@ -64,6 +64,26 @@ export interface ExamSyllabusBullet extends Struct.ComponentSchema {
   };
 }
 
+export interface QuestionOption extends Struct.ComponentSchema {
+  collectionName: 'components_question_options';
+  info: {
+    description: 'Single answer option for MCQ questions.';
+    displayName: 'Question Option';
+    icon: 'bulletList';
+  };
+  attributes: {
+    is_correct: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    text: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+        minLength: 1;
+      }>;
+  };
+}
+
 export interface SharedMedia extends Struct.ComponentSchema {
   collectionName: 'components_shared_media';
   info: {
@@ -132,6 +152,7 @@ declare module '@strapi/strapi' {
       'exam.faq': ExamFaq;
       'exam.mcq': ExamMcq;
       'exam.syllabus-bullet': ExamSyllabusBullet;
+      'question.option': QuestionOption;
       'shared.media': SharedMedia;
       'shared.quote': SharedQuote;
       'shared.rich-text': SharedRichText;

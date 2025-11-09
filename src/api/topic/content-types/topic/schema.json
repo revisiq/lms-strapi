@@ -37,6 +37,18 @@
     },
     "display_order": {
       "type": "integer"
+    },
+    "adaptive_quiz_decks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::adaptive-quiz-deck.adaptive-quiz-deck",
+      "mappedBy": "topic"
+    },
+    "structured_quiz_decks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::structured-quiz-deck.structured-quiz-deck",
+      "mappedBy": "topic"
     }
   }
 }

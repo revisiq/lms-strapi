@@ -49,6 +49,10 @@
       "type": "integer",
       "default": 0
     },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    },
     "tags": {
       "type": "relation",
       "relation": "manyToMany",
