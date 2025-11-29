@@ -4,10 +4,20 @@ import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::question.question', ({ strapi }) => ({
   async bulkCreate(ctx) {
-    const items = ctx.request.body;
+    let items = ctx.request.body;
+
+    // Support both formats: array of objects or array of { data: {...} } objects
     if (!Array.isArray(items)) {
       return ctx.badRequest('Request body must be an array of question objects');
     }
+
+    // Extract data from wrapper if present
+    items = items.map((item: any) => {
+      if (item && typeof item === 'object' && 'data' in item) {
+        return item.data;
+      }
+      return item;
+    });
 
     // 1) Normalize tag names → slugs & map to display names
     const slugify = (s: string) =>
@@ -22,9 +32,12 @@ export default factories.createCoreController('api::question.question', ({ strap
     for (const item of items) {
       if (Array.isArray(item.tags)) {
         for (const raw of item.tags) {
-          const slug = slugify(raw);
-          slugSet.add(slug);
-          slugToDisplay[slug] = raw;
+          // Handle both string tags and numeric tag IDs
+          if (typeof raw === 'string') {
+            const slug = slugify(raw);
+            slugSet.add(slug);
+            slugToDisplay[slug] = raw;
+          }
         }
       }
     }
@@ -54,21 +67,91 @@ export default factories.createCoreController('api::question.question', ({ strap
       nameToId[slug] = String(created.id);
     }
 
-    // 4) Now create questions, replacing tag strings with IDs
-    const results: Array<{ id?: string; status: string; message?: string }> = [];
-    for (const item of items) {
-      const tagIds = Array.isArray(item.tags) ? item.tags.map((raw: string) => nameToId[slugify(raw)]) : [];
+    // 4) Process and create questions
+    const results: Array<{ id?: string; status: string; message?: string; question?: string }> = [];
 
+    for (const item of items) {
       try {
-        const q = await strapi.documents('api::question.question').create({
+        // Process tags: convert string tags to IDs, keep numeric IDs as-is
+        let tagIds: string[] = [];
+        if (Array.isArray(item.tags)) {
+          tagIds = item.tags
+            .map((tag: string | number) => {
+              if (typeof tag === 'number') {
+                return String(tag);
+              }
+              if (typeof tag === 'string') {
+                return nameToId[slugify(tag)] || null;
+              }
+              return null;
+            })
+            .filter((id: string | null): id is string => id !== null);
+        }
+
+        // Process decks: ensure they're numeric IDs
+        let deckIds: string[] = [];
+        if (Array.isArray(item.decks)) {
+          deckIds = item.decks
+            .map((deck: number | string) => String(deck))
+            .filter((id: string) => id && !isNaN(Number(id)));
+        }
+
+        // Build question data with all supported fields
+        const questionType = item.type || 'MCQ';
+        const questionData: any = {
+          question: item.question,
+          type: questionType,
+          difficulty: item.difficulty || 'medium'
+        };
+
+        // Process options for MCQ questions
+        if (questionType === 'MCQ') {
+          if (!Array.isArray(item.options) || item.options.length === 0) {
+            throw new Error(`MCQ questions must include at least one option. Question: ${item.question || 'Unknown'}`);
+          }
+
+          if (item.options.length < 2) {
+            throw new Error(`MCQ questions must include at least two options. Question: ${item.question || 'Unknown'}`);
+          }
+
+          // Options are now a simple JSON array - just pass them as-is
+          questionData.options = item.options;
+        }
+
+        // Add optional fields if provided
+        if (item.explanation !== undefined && item.explanation !== null) {
+          questionData.explanation = String(item.explanation);
+        }
+
+        if (item.hint !== undefined && item.hint !== null) {
+          questionData.hint = String(item.hint);
+        }
+
+        if (item.example !== undefined && item.example !== null) {
+          questionData.example = String(item.example);
+        }
+
+        if (item.group_id !== undefined && item.group_id !== null) {
+          questionData.group_id = String(item.group_id).trim() || null;
+        }
+
+        // Create the question using entityService with proper format
+        const q = await strapi.entityService.create('api::question.question', {
           data: {
-            ...item,
-            tags: tagIds
+            ...questionData,
+            // Relations must use connect format for entityService
+            ...(tagIds.length > 0 && { tags: tagIds }),
+            ...(deckIds.length > 0 && { decks: deckIds })
           }
         });
+
         results.push({ id: String(q.id), status: 'ok' });
       } catch (err: any) {
-        results.push({ status: 'error', message: err.message });
+        results.push({
+          status: 'error',
+          message: err.message || 'Unknown error occurred',
+          question: item.question || 'Unknown question'
+        });
       }
     }
 

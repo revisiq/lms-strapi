@@ -25,9 +25,7 @@ const fetchExisting = async (event: any) => {
     return event.state.existingQuestion;
   }
 
-  const existing = await strapi.entityService.findOne(QUESTION_UID, id, {
-    populate: { options: true }
-  });
+  const existing = await strapi.entityService.findOne(QUESTION_UID, id);
 
   event.state.existingQuestion = existing;
   return existing;
@@ -52,15 +50,15 @@ const resolveArray = (value: any) => {
 };
 
 const normalizeOptions = (options: any[]) =>
-  options.map((option) => {
+  options.map((option, index) => {
     if (!option || typeof option !== 'object') {
-      throw new ValidationError('Each option must be an object.');
+      throw new ValidationError(`Each option must be an object. Option at index ${index}: ${JSON.stringify(option)}`);
     }
 
     const text = typeof option.text === 'string' ? option.text.trim() : undefined;
 
     if (!text) {
-      throw new ValidationError('Option text is required.');
+      throw new ValidationError(`Option text is required. Option at index ${index}: ${JSON.stringify(option)}, text value: ${option.text}, type: ${typeof option.text}`);
     }
 
     const isCorrect =

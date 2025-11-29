@@ -501,6 +501,7 @@ export interface ApiExamExam extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.Relation<'oneToMany', 'api::section.section'>;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -655,14 +656,13 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       'api::question.question'
     > &
       Schema.Attribute.Private;
-    options: Schema.Attribute.Component<'question.option', true>;
+    options: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
     question: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 150;
+        maxLength: 1000;
       }>;
-    stimulus: Schema.Attribute.Text;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
     type: Schema.Attribute.Enumeration<
       ['MCQ', 'RC', 'Parajumble', 'Syllogism', 'SentenceCompletion', 'Other']
@@ -832,6 +832,9 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     section: Schema.Attribute.Relation<'manyToOne', 'api::section.section'>;
     shortDescription: Schema.Attribute.Text;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     structured_quiz_decks: Schema.Attribute.Relation<
       'oneToMany',
       'api::structured-quiz-deck.structured-quiz-deck'

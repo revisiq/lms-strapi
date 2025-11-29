@@ -77,7 +77,6 @@ type QuestionEntity = {
   type: string;
   difficulty: string;
   group_id?: string | null;
-  stimulus?: string | null;
   options?: Array<{ id: number; text: string; is_correct: boolean }>;
   tags?: Array<{ id: number; name: string }>;
 };
@@ -304,9 +303,8 @@ const fetchQuestionsByIds = async (ids: number[]): Promise<QuestionEntity[]> => 
 
   const questions = (await strapi.entityService.findMany(QUESTION_UID, {
     filters: { id: { $in: ids } },
-    fields: ['id', 'question', 'explanation', 'type', 'difficulty', 'group_id', 'stimulus'],
+    fields: ['id', 'question', 'explanation', 'type', 'difficulty', 'group_id'],
     populate: {
-      options: true,
       tags: { fields: ['id', 'name'] }
     },
     sort: { id: 'asc' },
@@ -540,10 +538,9 @@ export default {
         group_id: question.group_id ?? null,
         stem: question.question,
         explanation: question.explanation ?? null,
-        stimulus: question.stimulus ?? null,
         options: Array.isArray(question.options)
-          ? question.options.map((option) => ({
-              id: option.id,
+          ? question.options.map((option, index) => ({
+              id: index + 1, // Use index as ID since JSON doesn't have component IDs
               text: option.text,
               ...(canRevealAnswers ? { is_correct: option.is_correct } : {})
             }))
