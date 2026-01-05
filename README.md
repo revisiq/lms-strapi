@@ -67,9 +67,14 @@ Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/
 - **Question**
   - `difficulty`: enum (`easy`, `medium`, `hard`) — required.
   - `type`: enum (`MCQ`, `RC`, `Parajumble`, `Syllogism`, `SentenceCompletion`, `Other`).
-  - `group_id`: optional string to tie related items (e.g. RC sets).
+  - `question_group`: optional relation to `QuestionGroup` for grouped questions (RC, DI, LR).
   - `options`: repeatable component (`Question Option`) with `text` + `is_correct` (used for MCQs).
-  - `stimulus`: optional long-form text for RC passages.
+- **Question Group**
+  - `title`: string — required, display name for the group.
+  - `type`: enum (`RC`, `DI`, `LR`, `Other`) — type of grouped content.
+  - `stimulus`: richtext — required, the shared passage/content for the group.
+  - `source`: optional string for attribution.
+  - `questions`: oneToMany relation to questions in this group.
 - **Adaptive Quiz Deck**
   - Stores difficulty-driven rules: `include_difficulties` (subset of `easy|medium|hard`, defaults to all three), `batch_size` (3–10), `max_questions_per_session ≥ batch_size`, and `rule_policy` (defaults to `"default-v1"`).
   - Optional metadata: `tags`, `exclusions`, `tag_logic` (`ANY`/`ALL`), `keep_groups_together`.
@@ -116,9 +121,18 @@ Response:
     "exclusions": [18]
   },
   "questions": [
-    { "id": 101, "difficulty": "medium", "group_id": null,   "tag_ids": [7, 14] },
-    { "id": 102, "difficulty": "hard",   "group_id": "rc-42", "tag_ids": [9] }
-  ]
+    { "id": 101, "difficulty": "medium", "question_group_id": null, "tag_ids": [7, 14] },
+    { "id": 102, "difficulty": "hard", "question_group_id": 42, "tag_ids": [9] }
+  ],
+  "groups": {
+    "42": {
+      "id": 42,
+      "type": "RC",
+      "title": "The Industrial Revolution",
+      "stimulus": "<p>The Industrial Revolution began in Britain...</p>",
+      "source": null
+    }
+  }
 }
 ```
 
@@ -135,22 +149,24 @@ GET /api/quiz/questions?ids=101,102,103
 Response:
 
 ```json
-[
-  {
-    "id": 101,
-    "type": "MCQ",
-    "difficulty": "medium",
-    "group_id": null,
-    "stem": "All cats are mammals...",
-    "explanation": null,
-    "stimulus": null,
-    "options": [
-      { "id": 201, "text": "All cats are pets" },
-      { "id": 202, "text": "Some pets are cats" }
-    ],
-    "tags": [{ "id": 7, "name": "syllogism" }]
-  }
-]
+{
+  "questions": [
+    {
+      "id": 101,
+      "type": "MCQ",
+      "difficulty": "medium",
+      "question_group_id": null,
+      "stem": "All cats are mammals...",
+      "explanation": null,
+      "options": [
+        { "id": 1, "text": "All cats are pets" },
+        { "id": 2, "text": "Some pets are cats" }
+      ],
+      "tags": [{ "id": 7, "name": "syllogism" }]
+    }
+  ],
+  "groups": {}
+}
 ```
 
 Use `includeAnswers=true` with the server secret header if you need to expose `is_correct` for grading or review workflows.

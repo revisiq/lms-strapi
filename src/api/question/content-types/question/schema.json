@@ -49,9 +49,6 @@
       "required": true,
       "default": "medium"
     },
-    "group_id": {
-      "type": "string"
-    },
     "type": {
       "type": "enumeration",
       "enum": ["MCQ", "RC", "Parajumble", "Syllogism", "SentenceCompletion", "Other"],
@@ -60,6 +57,12 @@
     },
     "options": {
       "type": "json"
+    },
+    "question_group": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::question-group.question-group",
+      "inversedBy": "questions"
     }
   }
 }

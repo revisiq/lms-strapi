@@ -131,8 +131,13 @@ export default factories.createCoreController('api::question.question', ({ strap
           questionData.example = String(item.example);
         }
 
-        if (item.group_id !== undefined && item.group_id !== null) {
-          questionData.group_id = String(item.group_id).trim() || null;
+        // Process question_group relation (numeric ID)
+        let questionGroupId: number | null = null;
+        if (item.question_group !== undefined && item.question_group !== null) {
+          const groupId = Number(item.question_group);
+          if (!isNaN(groupId) && groupId > 0) {
+            questionGroupId = groupId;
+          }
         }
 
         // Create the question using entityService with proper format
@@ -141,7 +146,8 @@ export default factories.createCoreController('api::question.question', ({ strap
             ...questionData,
             // Relations must use connect format for entityService
             ...(tagIds.length > 0 && { tags: tagIds }),
-            ...(deckIds.length > 0 && { decks: deckIds })
+            ...(deckIds.length > 0 && { decks: deckIds }),
+            ...(questionGroupId && { question_group: questionGroupId })
           }
         });
 

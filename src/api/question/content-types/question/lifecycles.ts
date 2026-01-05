@@ -58,7 +58,9 @@ const normalizeOptions = (options: any[]) =>
     const text = typeof option.text === 'string' ? option.text.trim() : undefined;
 
     if (!text) {
-      throw new ValidationError(`Option text is required. Option at index ${index}: ${JSON.stringify(option)}, text value: ${option.text}, type: ${typeof option.text}`);
+      throw new ValidationError(
+        `Option text is required. Option at index ${index}: ${JSON.stringify(option)}, text value: ${option.text}, type: ${typeof option.text}`
+      );
     }
 
     const isCorrect =
@@ -89,10 +91,6 @@ const ensureQuestionValidity = async (event: any) => {
   }
 
   data.difficulty = difficulty;
-
-  if (typeof data.group_id === 'string') {
-    data.group_id = data.group_id.trim() || null;
-  }
 
   if (type === 'MCQ') {
     const rawOptions = resolveArray(data.options) ?? resolveArray(existing?.options) ?? [];

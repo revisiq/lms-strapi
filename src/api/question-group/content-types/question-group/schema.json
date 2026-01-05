@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "question_groups",
+  "info": {
+    "singularName": "question-group",
+    "pluralName": "question-groups",
+    "displayName": "Question Group",
+    "description": "Shared content for grouped questions (RC passages, DI data, etc.)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["RC", "DI", "LR", "Other"],
+      "required": true,
+      "default": "RC"
+    },
+    "stimulus": {
+      "type": "richtext",
+      "required": true
+    },
+    "source": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question.question",
+      "mappedBy": "question_group"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    }
+  }
+}

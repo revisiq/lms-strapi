@@ -5,6 +5,7 @@ declare const strapi: any;
 const { ValidationError } = errors;
 
 const QUESTION_UID = 'api::question.question';
+const QUESTION_GROUP_UID = 'api::question-group.question-group';
 const ADAPTIVE_UID = 'api::adaptive-quiz-deck.adaptive-quiz-deck';
 const STRUCTURED_UID = 'api::structured-quiz-deck.structured-quiz-deck';
 const MAX_IDS_PER_REQUEST = 50;
@@ -66,8 +67,17 @@ type TopicEntity = {
 type QuestionIndexEntry = {
   id: number;
   difficulty: string;
-  group_id: string | null;
+  question_group_id: number | null;
   tag_ids: number[];
+};
+
+type QuestionGroupEntity = {
+  id: number;
+  title: string;
+  type: string;
+  stimulus: string;
+  source?: string | null;
+  tags?: Array<{ id: number }>;
 };
 
 type QuestionEntity = {
@@ -76,7 +86,7 @@ type QuestionEntity = {
   explanation?: string | null;
   type: string;
   difficulty: string;
-  group_id?: string | null;
+  question_group?: { id: number } | null;
   options?: Array<{ id: number; text: string; is_correct: boolean }>;
   tags?: Array<{ id: number; name: string }>;
 };
@@ -133,12 +143,19 @@ const buildTagFilter = (tagIds: number[], logic: 'ANY' | 'ALL') => {
   }
 
   if (logic === 'ALL') {
+    // For ALL logic, require all tags on the question directly
+    // (Group tags don't count for ALL - too complex to express in filters)
     return {
       $and: tagIds.map((id) => ({ tags: { id } }))
     };
   }
 
-  return { tags: { id: { $in: tagIds } } };
+  // For ANY logic, match questions where:
+  // - Question has any of the tags, OR
+  // - Question's group has any of the tags
+  return {
+    $or: [{ tags: { id: { $in: tagIds } } }, { question_group: { tags: { id: { $in: tagIds } } } }]
+  };
 };
 
 const excludeTagsFilter = (tagIds: number[]) =>
@@ -255,9 +272,10 @@ const chunkedQuestionFetch = async (filters: any): Promise<QuestionIndexEntry[]>
   while (true) {
     const pageData = (await strapi.entityService.findMany(QUESTION_UID, {
       filters,
-      fields: ['id', 'difficulty', 'group_id'],
+      fields: ['id', 'difficulty'],
       populate: {
-        tags: { fields: ['id'] }
+        tags: { fields: ['id'] },
+        question_group: { fields: ['id'] }
       },
       sort: { id: 'asc' },
       pagination: {
@@ -267,7 +285,7 @@ const chunkedQuestionFetch = async (filters: any): Promise<QuestionIndexEntry[]>
     })) as Array<{
       id: number;
       difficulty: string;
-      group_id?: string | null;
+      question_group?: { id: number } | null;
       tags?: Array<{ id: number }>;
     }>;
 
@@ -281,7 +299,7 @@ const chunkedQuestionFetch = async (filters: any): Promise<QuestionIndexEntry[]>
       results.push({
         id: Number(entry.id),
         difficulty: entry.difficulty,
-        group_id: entry.group_id ?? null,
+        question_group_id: entry.question_group ? Number(entry.question_group.id) : null,
         tag_ids: tagIds
       });
     }
@@ -303,15 +321,34 @@ const fetchQuestionsByIds = async (ids: number[]): Promise<QuestionEntity[]> => 
 
   const questions = (await strapi.entityService.findMany(QUESTION_UID, {
     filters: { id: { $in: ids } },
-    fields: ['id', 'question', 'explanation', 'type', 'difficulty', 'group_id'],
+    fields: ['id', 'question', 'explanation', 'type', 'difficulty', 'options'],
     populate: {
-      tags: { fields: ['id', 'name'] }
+      tags: { fields: ['id', 'name'] },
+      question_group: { fields: ['id'] }
     },
     sort: { id: 'asc' },
     limit: ids.length
   })) as QuestionEntity[];
 
   return questions;
+};
+
+const fetchQuestionGroupsByIds = async (ids: number[]): Promise<QuestionGroupEntity[]> => {
+  if (!ids.length) {
+    return [];
+  }
+
+  const groups = (await strapi.entityService.findMany(QUESTION_GROUP_UID, {
+    filters: { id: { $in: ids } },
+    fields: ['id', 'title', 'type', 'stimulus', 'source'],
+    populate: {
+      tags: { fields: ['id'] }
+    },
+    sort: { id: 'asc' },
+    limit: ids.length
+  })) as QuestionGroupEntity[];
+
+  return groups;
 };
 
 const buildAdaptiveFilters = (deck: AdaptiveDeck) => {
@@ -354,31 +391,22 @@ const buildStructuredQuestionOrder = async (deck: StructuredDeck) => {
     return [];
   }
 
-  const groupAnchors = ordered.filter((item) => item.kind === 'group').map((item) => item.id);
+  // Collect all question_group IDs from ordered_items where kind === 'group'
+  const questionGroupIds = ordered.filter((item) => item.kind === 'group').map((item) => item.id);
 
-  const anchorQuestions = groupAnchors.length ? await fetchQuestionsByIds(groupAnchors) : [];
-  const groupIdByAnchor = new Map<number, string>();
-  const groupIds = new Set<string>();
-
-  for (const question of anchorQuestions) {
-    if (question.group_id) {
-      groupIdByAnchor.set(Number(question.id), question.group_id);
-      groupIds.add(question.group_id);
-    }
-  }
-
-  const groupedQuestions = new Map<string, number[]>();
-  if (groupIds.size) {
+  // Fetch all questions belonging to these groups
+  const groupedQuestions = new Map<number, number[]>();
+  if (questionGroupIds.length) {
     const members = await chunkedQuestionFetch({
-      group_id: { $in: Array.from(groupIds) }
+      question_group: { id: { $in: questionGroupIds } }
     });
 
     for (const entry of members) {
-      if (!entry.group_id) continue;
-      if (!groupedQuestions.has(entry.group_id)) {
-        groupedQuestions.set(entry.group_id, []);
+      if (!entry.question_group_id) continue;
+      if (!groupedQuestions.has(entry.question_group_id)) {
+        groupedQuestions.set(entry.question_group_id, []);
       }
-      groupedQuestions.get(entry.group_id)!.push(entry.id);
+      groupedQuestions.get(entry.question_group_id)!.push(entry.id);
     }
   }
 
@@ -388,11 +416,10 @@ const buildStructuredQuestionOrder = async (deck: StructuredDeck) => {
     if (item.kind === 'question') {
       resolved.push(item.id);
     } else {
-      const groupId = groupIdByAnchor.get(item.id);
-      if (groupId && groupedQuestions.has(groupId)) {
-        resolved.push(...groupedQuestions.get(groupId)!);
-      } else {
-        resolved.push(item.id);
+      // item.kind === 'group', item.id is the question_group ID
+      const groupQuestionIds = groupedQuestions.get(item.id);
+      if (groupQuestionIds && groupQuestionIds.length) {
+        resolved.push(...groupQuestionIds);
       }
     }
   }
@@ -493,7 +520,7 @@ export default {
           .map((question) => ({
             id: Number(question.id),
             difficulty: question.difficulty,
-            group_id: question.group_id ?? null,
+            question_group_id: question.question_group ? Number(question.question_group.id) : null,
             tag_ids: Array.isArray(question.tags) ? question.tags.map((tag) => Number(tag.id)) : []
           }));
       } else {
@@ -501,10 +528,32 @@ export default {
       }
     }
 
+    // Collect unique question_group_ids and fetch group details
+    const groupIds = Array.from(
+      new Set(questions.map((q) => q.question_group_id).filter((id): id is number => id !== null))
+    );
+
+    const groupEntities = await fetchQuestionGroupsByIds(groupIds);
+    const groups: Record<
+      number,
+      { id: number; type: string; title: string; stimulus: string; source: string | null; tag_ids: number[] }
+    > = {};
+    for (const group of groupEntities) {
+      groups[group.id] = {
+        id: group.id,
+        type: group.type,
+        title: group.title,
+        stimulus: group.stimulus,
+        source: group.source ?? null,
+        tag_ids: Array.isArray(group.tags) ? group.tags.map((tag) => Number(tag.id)) : []
+      };
+    }
+
     setCacheHeaders(ctx);
     ctx.body = {
       deck: metadata,
-      questions
+      questions,
+      groups
     };
   },
 
@@ -519,30 +568,24 @@ export default {
       return ctx.badRequest(`A maximum of ${MAX_IDS_PER_REQUEST} ids can be requested.`);
     }
 
-    const includeAnswers = String(ctx.query.includeAnswers ?? '').toLowerCase() === 'true';
-    const secretHeader = ctx.request.headers['x-quiz-secret'];
-    const requestSecret = Array.isArray(secretHeader) ? secretHeader[0] : secretHeader;
-    const serverSecret = getServerSecret();
-    const canRevealAnswers = includeAnswers && serverSecret && requestSecret === serverSecret;
-
     const questions = await fetchQuestionsByIds(ids);
     const questionMap = new Map<number, QuestionEntity>(questions.map((question) => [Number(question.id), question]));
 
-    const payload = ids
+    const questionPayload = ids
       .map((id) => questionMap.get(id))
       .filter((question): question is QuestionEntity => Boolean(question))
       .map((question) => ({
         id: Number(question.id),
         type: question.type,
         difficulty: question.difficulty,
-        group_id: question.group_id ?? null,
+        question_group_id: question.question_group ? Number(question.question_group.id) : null,
         stem: question.question,
         explanation: question.explanation ?? null,
         options: Array.isArray(question.options)
           ? question.options.map((option, index) => ({
               id: index + 1, // Use index as ID since JSON doesn't have component IDs
               text: option.text,
-              ...(canRevealAnswers ? { is_correct: option.is_correct } : {})
+              is_correct: option.is_correct
             }))
           : [],
         tags: Array.isArray(question.tags)
@@ -553,8 +596,32 @@ export default {
           : []
       }));
 
+    // Collect unique question_group_ids and fetch group details
+    const groupIds = Array.from(
+      new Set(questionPayload.map((q) => q.question_group_id).filter((id): id is number => id !== null))
+    );
+
+    const groupEntities = await fetchQuestionGroupsByIds(groupIds);
+    const groups: Record<
+      number,
+      { id: number; type: string; title: string; stimulus: string; source: string | null; tag_ids: number[] }
+    > = {};
+    for (const group of groupEntities) {
+      groups[group.id] = {
+        id: group.id,
+        type: group.type,
+        title: group.title,
+        stimulus: group.stimulus,
+        source: group.source ?? null,
+        tag_ids: Array.isArray(group.tags) ? group.tags.map((tag) => Number(tag.id)) : []
+      };
+    }
+
     setCacheHeaders(ctx);
-    ctx.set('X-Total-Count', String(payload.length));
-    ctx.body = payload;
+    ctx.set('X-Total-Count', String(questionPayload.length));
+    ctx.body = {
+      questions: questionPayload,
+      groups
+    };
   }
 };

@@ -617,6 +617,50 @@ export interface ApiMcqSetMcqSet extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiQuestionGroupQuestionGroup
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'question_groups';
+  info: {
+    description: 'Shared content for grouped questions (RC passages, DI data, etc.)';
+    displayName: 'Question Group';
+    pluralName: 'question-groups';
+    singularName: 'question-group';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::question-group.question-group'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    questions: Schema.Attribute.Relation<'oneToMany', 'api::question.question'>;
+    source: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    stimulus: Schema.Attribute.RichText & Schema.Attribute.Required;
+    tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    type: Schema.Attribute.Enumeration<['RC', 'DI', 'LR', 'Other']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'RC'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
   collectionName: 'questions';
   info: {
@@ -645,7 +689,6 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 300;
       }>;
-    group_id: Schema.Attribute.String;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -663,6 +706,10 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1000;
       }>;
+    question_group: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::question-group.question-group'
+    >;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
     type: Schema.Attribute.Enumeration<
       ['MCQ', 'RC', 'Parajumble', 'Syllogism', 'SentenceCompletion', 'Other']
@@ -1358,6 +1405,7 @@ declare module '@strapi/strapi' {
       'api::deck.deck': ApiDeckDeck;
       'api::exam.exam': ApiExamExam;
       'api::mcq-set.mcq-set': ApiMcqSetMcqSet;
+      'api::question-group.question-group': ApiQuestionGroupQuestionGroup;
       'api::question.question': ApiQuestionQuestion;
       'api::section.section': ApiSectionSection;
       'api::structured-quiz-deck.structured-quiz-deck': ApiStructuredQuizDeckStructuredQuizDeck;
