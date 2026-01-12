@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_question_options",
+  "info": {
+    "displayName": "Question Option",
+    "icon": "bulletList",
+    "description": "Single answer option for MCQ questions."
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "is_correct": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

@@ -14,11 +14,10 @@
     "question": {
       "type": "string",
       "required": true,
-      "maxLength": 150
+      "maxLength": 1000
     },
     "answer": {
       "type": "text",
-      "required": true,
       "maxLength": 180
     },
     "hint": {
@@ -43,6 +42,27 @@
     "explanation": {
       "type": "string",
       "maxLength": 300
+    },
+    "difficulty": {
+      "type": "enumeration",
+      "enum": ["easy", "medium", "hard"],
+      "required": true,
+      "default": "medium"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["MCQ", "RC", "Parajumble", "Syllogism", "SentenceCompletion", "Other"],
+      "default": "MCQ",
+      "required": true
+    },
+    "options": {
+      "type": "json"
+    },
+    "question_group": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::question-group.question-group",
+      "inversedBy": "questions"
     }
   }
 }
