@@ -11,7 +11,7 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "name": {
+    "display_name": {
       "type": "string",
       "required": true,
       "unique": true
@@ -20,10 +20,6 @@
       "type": "string",
       "required": true,
       "unique": true
-    },
-    "display_name": {
-      "type": "string",
-      "required": true
     },
     "decks": {
       "type": "relation",
@@ -37,11 +33,21 @@
       "target": "api::section.section",
       "inversedBy": "topics"
     },
+    "blurb": {
+      "type": "string",
+      "maxLength": 150
+    },
     "shortDescription": {
-      "type": "text"
+      "type": "text",
+      "maxLength": 250
+    },
+    "description": {
+      "type": "text",
+      "maxLength": 1000
     },
     "display_order": {
-      "type": "integer"
+      "type": "integer",
+      "default": 0
     },
     "adaptive_quiz_decks": {
       "type": "relation",

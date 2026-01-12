@@ -11,23 +11,25 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "name": {
+    "display_name": {
       "type": "string",
       "required": true,
       "unique": true
     },
-    "display_name": {
+    "blurb": {
       "type": "string",
-      "required": true,
-      "unique": false
+      "maxLength": 150
+    },
+    "shortDescription": {
+      "type": "text",
+      "maxLength": 250
     },
     "description": {
-      "type": "string"
+      "type": "text",
+      "maxLength": 1000
     },
     "display_order": {
       "type": "integer",
-      "required": true,
-      "unique": true,
       "default": 0
     },
     "is_visible": {
@@ -44,9 +46,6 @@
       "relation": "manyToOne",
       "target": "api::exam.exam",
       "inversedBy": "sections"
-    },
-    "shortDescription": {
-      "type": "text"
     },
     "topics": {
       "type": "relation",

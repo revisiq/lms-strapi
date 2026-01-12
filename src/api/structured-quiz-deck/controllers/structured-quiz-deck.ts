@@ -5,6 +5,34 @@
 import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::structured-quiz-deck.structured-quiz-deck', ({ strapi }) => ({
+  // Filter decks by visibility in find
+  async find(ctx) {
+    const originalFilters = ctx.query?.filters;
+    const visibilityFilter = originalFilters
+      ? { $and: [originalFilters, { visible: true }] }
+      : { visible: true };
+
+    ctx.query = {
+      ...ctx.query,
+      filters: visibilityFilter
+    };
+
+    return await super.find(ctx);
+  },
+
+  // Check visibility in findOne
+  async findOne(ctx) {
+    const response = await super.findOne(ctx);
+    const isVisible = response?.data?.attributes?.visible ?? false;
+
+    if (!isVisible) {
+      return ctx.notFound('Structured quiz deck not found');
+    }
+
+    return response;
+  },
+
+
   async getQuestionIndex(ctx) {
     const documentId = ctx.params?.documentId?.trim();
 

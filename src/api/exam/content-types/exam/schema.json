@@ -11,17 +11,30 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "name": {
+    "display_name": {
       "type": "string",
       "required": true
     },
     "slug": {
       "type": "uid",
-      "targetField": "name",
+      "targetField": "display_name",
       "required": true
     },
+    "blurb": {
+      "type": "string",
+      "maxLength": 150
+    },
+    "shortDescription": {
+      "type": "text",
+      "maxLength": 250
+    },
     "description": {
-      "type": "richtext"
+      "type": "text",
+      "maxLength": 1000
+    },
+    "display_order": {
+      "type": "integer",
+      "default": 0
     },
     "sections": {
       "type": "relation",

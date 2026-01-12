@@ -5,6 +5,34 @@
 import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::adaptive-quiz-deck.adaptive-quiz-deck', ({ strapi }) => ({
+  // Filter decks by visibility in find
+  async find(ctx) {
+    const originalFilters = ctx.query?.filters;
+    const visibilityFilter = originalFilters
+      ? { $and: [originalFilters, { visible: true }] }
+      : { visible: true };
+
+    ctx.query = {
+      ...ctx.query,
+      filters: visibilityFilter
+    };
+
+    return await super.find(ctx);
+  },
+
+  // Check visibility in findOne
+  async findOne(ctx) {
+    const response = await super.findOne(ctx);
+    const isVisible = response?.data?.attributes?.visible ?? false;
+
+    if (!isVisible) {
+      return ctx.notFound('Adaptive quiz deck not found');
+    }
+
+    return response;
+  },
+
+
   async getQuestionIndex(ctx) {
     const documentId = ctx.params?.documentId?.trim();
 
@@ -52,20 +80,20 @@ export default factories.createCoreController('api::adaptive-quiz-deck.adaptive-
           rule_policy: deck.rule_policy || null,
           exam: deck.topic?.section?.exam
             ? {
-                name: deck.topic.section.exam.name,
+                name: deck.topic.section.exam.display_name,
                 slug: deck.topic.section.exam.slug
               }
             : null,
           section: deck.topic?.section
             ? {
-                name: deck.topic.section.name,
+                name: deck.topic.section.display_name,
                 slug: deck.topic.section.slug
               }
             : null,
           topic: deck.topic
             ? {
                 id: deck.topic.id,
-                name: deck.topic.name,
+                name: deck.topic.display_name,
                 slug: deck.topic.slug
               }
             : null
@@ -148,20 +176,20 @@ export default factories.createCoreController('api::adaptive-quiz-deck.adaptive-
         rule_policy: deck.rule_policy || null,
         exam: deck.topic?.section?.exam
           ? {
-              name: deck.topic.section.exam.name,
+              name: deck.topic.section.exam.display_name,
               slug: deck.topic.section.exam.slug
             }
           : null,
         section: deck.topic?.section
           ? {
-              name: deck.topic.section.name,
+              name: deck.topic.section.display_name,
               slug: deck.topic.section.slug
             }
           : null,
         topic: deck.topic
           ? {
               id: deck.topic.id,
-              name: deck.topic.name,
+              name: deck.topic.display_name,
               slug: deck.topic.slug
             }
           : null

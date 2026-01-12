@@ -29,19 +29,19 @@ const extractHierarchy = (topic: any) => {
   return {
     topic: {
       id: Number(topic.id),
-      name: topic.display_name ?? topic.name,
-      slug: topic.slug ?? slugify(topic.name) ?? topic.name
+      name: topic.display_name,
+      slug: topic.slug ?? slugify(topic.display_name) ?? topic.display_name
     },
     section: section
       ? {
-          name: section.display_name ?? section.name,
-          slug: section.slug ?? slugify(section.name) ?? section.name
+          name: section.display_name,
+          slug: section.slug ?? slugify(section.display_name) ?? section.display_name
         }
       : null,
     exam: exam
       ? {
-          name: exam.name,
-          slug: exam.slug ?? slugify(exam.name) ?? exam.name
+          name: exam.display_name,
+          slug: exam.slug ?? slugify(exam.display_name) ?? exam.display_name
         }
       : null
   };

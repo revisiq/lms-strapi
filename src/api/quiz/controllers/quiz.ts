@@ -48,17 +48,15 @@ type StructuredDeck = {
 
 type TopicEntity = {
   id: number;
-  name: string;
-  display_name?: string;
+  display_name: string;
   slug?: string;
   section?: {
     id: number;
-    name: string;
-    display_name?: string;
+    display_name: string;
     slug?: string;
     exam?: {
       id: number;
-      name: string;
+      display_name: string;
       slug?: string;
     };
   };
@@ -180,19 +178,19 @@ const extractHierarchy = (topic?: TopicEntity): TopicHierarchy => {
   return {
     topic: {
       id: Number(topic.id),
-      name: topic.display_name ?? topic.name,
-      slug: topic.slug ?? slugify(topic.name) ?? topic.name
+      name: topic.display_name,
+      slug: topic.slug ?? slugify(topic.display_name) ?? topic.display_name
     },
     section: section
       ? {
-          name: section.display_name ?? section.name,
-          slug: section.slug ?? slugify(section.name) ?? section.name
+          name: section.display_name,
+          slug: section.slug ?? slugify(section.display_name) ?? section.display_name
         }
       : null,
     exam: exam
       ? {
-          name: exam.name,
-          slug: exam.slug ?? slugify(exam.name) ?? exam.name
+          name: exam.display_name,
+          slug: exam.slug ?? slugify(exam.display_name) ?? exam.display_name
         }
       : null
   };
@@ -219,12 +217,12 @@ const fetchAdaptiveDeck = async (slug: string): Promise<AdaptiveDeck | null> => 
       tags: { fields: ['id'] },
       exclusions: { fields: ['id'] },
       topic: {
-        fields: ['id', 'name', 'display_name', 'slug'],
+        fields: ['id', 'display_name', 'slug'],
         populate: {
           section: {
-            fields: ['id', 'name', 'display_name', 'slug'],
+            fields: ['id', 'display_name', 'slug'],
             populate: {
-              exam: { fields: ['id', 'name', 'slug'] }
+              exam: { fields: ['id', 'display_name', 'slug'] }
             }
           }
         }
@@ -248,12 +246,12 @@ const fetchStructuredDeck = async (slug: string): Promise<StructuredDeck | null>
       exclusions: { fields: ['id'] },
       ordered_items: true,
       topic: {
-        fields: ['id', 'name', 'display_name', 'slug'],
+        fields: ['id', 'display_name', 'slug'],
         populate: {
           section: {
-            fields: ['id', 'name', 'display_name', 'slug'],
+            fields: ['id', 'display_name', 'slug'],
             populate: {
-              exam: { fields: ['id', 'name', 'slug'] }
+              exam: { fields: ['id', 'display_name', 'slug'] }
             }
           }
         }
