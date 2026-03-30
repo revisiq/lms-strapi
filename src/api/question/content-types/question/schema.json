@@ -22,10 +22,11 @@
     },
     "hint": {
       "type": "string",
-      "maxLength": 80
+      "maxLength": 140
     },
     "example": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 150
     },
     "decks": {
       "type": "relation",
@@ -41,7 +42,7 @@
     },
     "explanation": {
       "type": "string",
-      "maxLength": 300
+      "maxLength": 400
     },
     "difficulty": {
       "type": "enumeration",
