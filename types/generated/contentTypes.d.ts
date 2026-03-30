@@ -694,14 +694,17 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     difficulty: Schema.Attribute.Enumeration<['easy', 'medium', 'hard']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'medium'>;
-    example: Schema.Attribute.String;
+    example: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 150;
+      }>;
     explanation: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
+        maxLength: 400;
       }>;
     hint: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 80;
+        maxLength: 140;
       }>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -758,10 +761,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     display_name: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    display_order: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique &
-      Schema.Attribute.DefaultTo<0>;
+    display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     exam: Schema.Attribute.Relation<'manyToOne', 'api::exam.exam'>;
     is_visible: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
@@ -896,7 +896,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     display_name: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    display_order: Schema.Attribute.Integer;
+    display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
