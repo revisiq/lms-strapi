@@ -7,6 +7,14 @@ export default {
       config: {
         auth: false // or true if you want it protected
       }
+    },
+    {
+      method: 'POST',
+      path: '/questions/bulk-edit',
+      handler: 'question.bulkEdit',
+      config: {
+        auth: false
+      }
     }
   ]
 };

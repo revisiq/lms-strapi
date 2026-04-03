@@ -12,7 +12,7 @@
   },
   "attributes": {
     "question": {
-      "type": "string",
+      "type": "text",
       "required": true,
       "maxLength": 1000
     },
