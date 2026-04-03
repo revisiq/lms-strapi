@@ -714,7 +714,7 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     options: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
-    question: Schema.Attribute.String &
+    question: Schema.Attribute.Text &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1000;
