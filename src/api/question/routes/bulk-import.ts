@@ -15,6 +15,14 @@ export default {
       config: {
         auth: false
       }
+    },
+    {
+      method: 'POST',
+      path: '/questions/bulk-delete',
+      handler: 'question.bulkDelete',
+      config: {
+        auth: false
+      }
     }
   ]
 };

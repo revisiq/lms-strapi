@@ -43,6 +43,24 @@ function parseQuestionId(item: any): { id: number } | { reason: 'missing_id' | '
   return { id: n };
 }
 
+/** Id from a number, numeric string, or `{ id }` (after optional `data` unwrap). */
+function parseDeleteEntryId(entry: any): { id: number } | { reason: 'missing_id' | 'invalid_id' } {
+  if (entry === null || entry === undefined) {
+    return { reason: 'missing_id' };
+  }
+  if (typeof entry === 'number' || typeof entry === 'string') {
+    const n = Number(entry);
+    if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) {
+      return { reason: 'invalid_id' };
+    }
+    return { id: n };
+  }
+  if (typeof entry === 'object' && 'id' in entry) {
+    return parseDeleteEntryId(entry.id);
+  }
+  return { reason: 'invalid_id' };
+}
+
 function itemTagIds(item: any, nameToId: Record<string, string>): string[] {
   if (!Array.isArray(item.tags)) {
     return [];
@@ -318,6 +336,53 @@ export default factories.createCoreController(QUESTION_UID, ({ strapi }) => ({
           status: 'error',
           message: err.message || 'Unknown error occurred',
           question: item?.question || 'Unknown question'
+        });
+      }
+    }
+
+    ctx.body = results;
+  },
+
+  async bulkDelete(ctx) {
+    let entries = ctx.request.body;
+
+    if (!Array.isArray(entries)) {
+      return ctx.badRequest('Request body must be an array of ids or { id } objects');
+    }
+
+    entries = unwrapBulkItems(entries);
+
+    const results: BulkQuestionResult[] = [];
+
+    for (const entry of entries) {
+      const parsed = parseDeleteEntryId(entry);
+      if ('reason' in parsed) {
+        results.push({
+          status: 'skipped',
+          reason: parsed.reason
+        });
+        continue;
+      }
+
+      const id = parsed.id;
+      const existing = await strapi.entityService.findOne(QUESTION_UID, id);
+      if (!existing) {
+        results.push({
+          status: 'skipped',
+          reason: 'not_found',
+          id: String(id)
+        });
+        continue;
+      }
+
+      try {
+        await strapi.entityService.delete(QUESTION_UID, id);
+        results.push({ id: String(id), status: 'ok' });
+      } catch (err: any) {
+        results.push({
+          id: String(id),
+          status: 'error',
+          message: err.message || 'Unknown error occurred'
         });
       }
     }
