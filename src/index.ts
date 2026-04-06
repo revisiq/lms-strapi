@@ -52,7 +52,23 @@ const backfillQuestionMetadata = async (strapi: Core.Strapi) => {
 };
 
 export default {
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Register before filesystem API routes (see initRouting). Route files use readdir order, which
+    // differs between macOS and Linux; a GET /exams/:slug layer can win over POST /exams/bulk/create
+    // and produce 405 from koa-router allowedMethods().
+    strapi.server.routes({
+      type: 'content-api',
+      routes: [
+        {
+          method: 'POST',
+          path: '/exams/bulk/create',
+          handler: 'exam.bulkCreateNested',
+          config: { auth: false },
+          info: { apiName: 'exam' }
+        }
+      ]
+    });
+  },
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await backfillQuestionMetadata(strapi);
   }
