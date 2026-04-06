@@ -38,14 +38,10 @@ const backfillQuestionMetadata = async (strapi: Core.Strapi) => {
         .groupBy('question_id')
         .havingRaw('COUNT(component_id) >= 2')) as Array<{ question_id: number }>;
 
-      const mcqIds = mcqCandidates
-        .map((row) => Number(row.question_id))
-        .filter((id) => Number.isFinite(id) && id > 0);
+      const mcqIds = mcqCandidates.map((row) => Number(row.question_id)).filter((id) => Number.isFinite(id) && id > 0);
 
       if (mcqIds.length) {
-        await knex(QUESTION_TABLE)
-          .whereIn('id', mcqIds)
-          .update({ type: 'MCQ' });
+        await knex(QUESTION_TABLE).whereIn('id', mcqIds).update({ type: 'MCQ' });
       }
     }
   }
