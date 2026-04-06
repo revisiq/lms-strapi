@@ -13,8 +13,7 @@
   "attributes": {
     "display_name": {
       "type": "string",
-      "required": true,
-      "unique": true
+      "required": true
     },
     "blurb": {
       "type": "string",
@@ -39,7 +38,8 @@
     },
     "slug": {
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "exam": {
       "type": "relation",

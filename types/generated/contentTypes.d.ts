@@ -758,9 +758,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1000;
       }>;
-    display_name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    display_name: Schema.Attribute.String & Schema.Attribute.Required;
     display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     exam: Schema.Attribute.Relation<'manyToOne', 'api::exam.exam'>;
     is_visible: Schema.Attribute.Boolean &
@@ -777,7 +775,9 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 250;
       }>;
-    slug: Schema.Attribute.String & Schema.Attribute.Required;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     topics: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -893,9 +893,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1000;
       }>;
-    display_name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    display_name: Schema.Attribute.String & Schema.Attribute.Required;
     display_order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
