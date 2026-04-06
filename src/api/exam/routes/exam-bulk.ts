@@ -2,7 +2,8 @@ export default {
   routes: [
     {
       method: 'POST',
-      path: '/exams/bulk',
+      // Avoid `/exams/bulk`: `GET /exams/:slug` / `:id` can claim that path and yield POST → 405.
+      path: '/exams/bulk/create',
       handler: 'exam.bulkCreateNested',
       config: {
         auth: false
