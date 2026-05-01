@@ -36,6 +36,10 @@
       "type": "integer",
       "default": 0
     },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    },
     "sections": {
       "type": "relation",
       "relation": "oneToMany",

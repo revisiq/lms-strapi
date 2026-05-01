@@ -154,6 +154,18 @@ function buildTopicCreateData(
 }
 
 export default factories.createCoreController(EXAM_UID, ({ strapi }) => ({
+  async find(ctx) {
+    const originalFilters = ctx.query?.filters;
+    const visibilityFilter = originalFilters ? { $and: [originalFilters, { visible: true }] } : { visible: true };
+
+    ctx.query = {
+      ...ctx.query,
+      filters: visibilityFilter
+    };
+
+    return await super.find(ctx);
+  },
+
   async findBySlug(ctx) {
     const slug = ctx.params?.slug?.trim();
 
@@ -163,7 +175,8 @@ export default factories.createCoreController(EXAM_UID, ({ strapi }) => ({
 
     const [exam] = await strapi.entityService.findMany(EXAM_UID, {
       filters: {
-        slug: { $eq: slug }
+        slug: { $eq: slug },
+        visible: { $eq: true }
       },
       populate: {
         sections: {
@@ -195,7 +208,8 @@ export default factories.createCoreController(EXAM_UID, ({ strapi }) => ({
 
     const [exam] = await strapi.entityService.findMany(EXAM_UID, {
       filters: {
-        slug: { $eq: slug }
+        slug: { $eq: slug },
+        visible: { $eq: true }
       },
       populate: {
         sections: {
